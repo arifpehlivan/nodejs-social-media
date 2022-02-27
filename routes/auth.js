@@ -14,18 +14,24 @@ router.post("/register",async (req,res)=>{
         });
         const user=await newUser.save();
         res.status(200).json(user)
-    } catch (error) {
-        console.log(err)
+    } catch (err) {
+        res.status(500).json(err);
     }
+});
 
-    // const user=await new User({
-    //     username:"Arif",
-    //     email:"arif@gmail.com",
-    //     password:"1234"
-    // });
+//Login
+router.post("/login",async (req,res)=>{
+    try {
+        const user=await User.findOne({email:req.body.email});
+        !user&&res.status(404).json("User not found");
 
-    // await user.save();
-    // res.send("ok");
+        const validPassword=await bcyrpt.compare(req.body.password, user.password);
+        !validPassword&&res.status(400).json("Wrong Password");
+
+        res.status(200).json(user);
+    } catch (err) {
+        res.status(500).json(err);
+    }
 });
 
 module.exports=router;
